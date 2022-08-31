@@ -8,6 +8,17 @@ const ListKeyword = () => {
         dispatch(removeKeyword(index));
     };
 
+    const handleSearch = () => {
+        chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+            const port = chrome.tabs.connect(tabs[0].id, { name: 'popup-content' });
+            port.postMessage({ action: 'scrapping', payload: state.keywords });
+
+            port.onMessage.addListener((res) => {
+                console.log(res);
+            });
+        });
+    };
+
     return (
         <>
             <ul>
@@ -17,6 +28,7 @@ const ListKeyword = () => {
                     </li>
                 ))}
             </ul>
+            <button onClick={handleSearch}>Search</button>
         </>
     );
 };
