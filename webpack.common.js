@@ -36,8 +36,8 @@ module.exports = {
     ],
     entry: {
         popup: path.resolve(__dirname, 'src', 'popup', 'index.js'),
-        // contentScript: path.resolve(__dirname, 'src', 'content', 'contentScript.js'),
-        // background: path.resolve(__dirname, 'src', 'background', 'background.js'),
+        contentScript: path.resolve(__dirname, 'src', 'content', 'index.js'),
+        background: path.resolve(__dirname, 'src', 'background', 'index.js'),
     },
     output: {
         filename: '[name].js',

@@ -5,7 +5,7 @@ import ListKeyword from './ListKeyword';
 
 const App = () => {
     return (
-        <div className="wrapper">
+        <div className="wrapper" style={{ width: '500px' }}>
             <EnterKeyword />
             <ListKeyword />
         </div>

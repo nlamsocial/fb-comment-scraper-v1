@@ -1,0 +1,31 @@
+{
+    "manifest_version": 3,
+    "name": "fb comment scraper",
+    "version": "0.0.1",
+    "description": "beta version",
+    "action": {
+        "default_icon": {
+            "16": "images/chat-bubble.png",
+            "24": "images/chat-bubble.png",
+            "32": "images/chat-bubble.png",
+            "128": "images/chat-bubble.png"
+        },
+        "default_title": "Comment scraper",
+        "default_popup": "popup.html"
+    },
+    "icons": {
+        "16": "images/chat-bubble.png",
+        "24": "images/chat-bubble.png",
+        "32": "images/chat-bubble.png",
+        "128": "images/chat-bubble.png"
+    },
+    "content_scripts": [
+        {
+            "matches": ["https://*.facebook.com/*"],
+            "js": ["contentScript.js"]
+        }
+    ],
+    "background": {
+        "service_worker": "background.js"
+    }
+}
