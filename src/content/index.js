@@ -2,7 +2,7 @@ chrome.runtime.onConnect.addListener((port) => {
     port.onMessage.addListener(async (req) => {
         if (req.action === 'scrapping') {
             const comments = [];
-            for (let i = 1; i < 50; i++) {
+            for (let i = 1; i < 20; i++) {
                 let posinset = null;
                 if (document.querySelector(`div[aria-posinset="${i}"]`)) {
                     posinset = await waitForElm(`div[aria-posinset="${i}"]`);
@@ -25,46 +25,44 @@ chrome.runtime.onConnect.addListener((port) => {
                             let btn = btnElms[1].querySelector('div[role="button"]');
                             btn.click();
                             const menuElm = await waitForElm('div[role="menu"]');
-                            // if (menuElm) console.log(menuElm.querySelectorAll('div[role="menuitem"]'));
                             const menuItems = menuElm.querySelectorAll('div[role="menuitem"]');
-                            console.log(menuItems[2].click());
-                            await sleep(1000);
+                            menuItems[2].click();
+                            // await sleep(1000);
                         }
                         let btn = btnElms[0].querySelector('div[role="button"]');
                         btn.click();
-                        await sleep(1000);
+                        await sleep(2000);
                     }
 
                     const commentsElm = ulElms[0].querySelectorAll('span[lang="vi-VN"]');
-                    [...commentsElm].map(async (commentElm, index) => {
+                    [...commentsElm].map(async (commentElm) => {
+                        const comment = {};
                         const btnReadMoreElms = commentElm.querySelectorAll('div[role="button"]');
                         if (btnReadMoreElms.length > 0) {
                             btnReadMoreElms[0].click();
                             await sleep(1000);
-                            comments.push({
-                                url: commentElm.parentElement.parentElement.querySelector('a').getAttribute('href'),
-                                value: commentElm.innerText,
-                            });
-                            console.log({
-                                url: commentElm.parentElement.parentElement.querySelector('a').getAttribute('href'),
-                                value: commentElm.innerText,
+                            port.postMessage({
+                                status: 'successfully',
+                                posinset: i,
+                                payload: {
+                                    url: commentElm.parentElement.parentElement.querySelector('a').getAttribute('href'),
+                                    value: commentElm.innerText,
+                                },
                             });
                         } else {
-                            comments.push({
-                                url: commentElm.parentElement.parentElement.querySelector('a').getAttribute('href'),
-                                value: commentElm.innerText,
-                            });
-                            console.log({
-                                url: commentElm.parentElement.parentElement.querySelector('a').getAttribute('href'),
-                                value: commentElm.innerText,
+                            port.postMessage({
+                                status: 'successfully',
+                                posinset: i,
+                                payload: {
+                                    url: commentElm.parentElement.parentElement.querySelector('a').getAttribute('href'),
+                                    value: commentElm.innerText,
+                                },
                             });
                         }
                     });
                 }
             }
-            console.log(comments);
         }
-        port.postMessage({ status: 'successfully' });
     });
 });
 
