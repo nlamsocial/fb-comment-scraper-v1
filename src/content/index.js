@@ -1,8 +1,10 @@
 chrome.runtime.onConnect.addListener((port) => {
     port.onMessage.addListener(async (req) => {
         if (req.action === 'scrapping') {
-            const comments = [];
-            for (let i = 1; i < 20; i++) {
+            const keywords = handleToRegex(req.payload);
+            console.log(keywords);
+
+            for (let i = 1; i < 200; i++) {
                 let posinset = null;
                 if (document.querySelector(`div[aria-posinset="${i}"]`)) {
                     posinset = await waitForElm(`div[aria-posinset="${i}"]`);
@@ -27,7 +29,6 @@ chrome.runtime.onConnect.addListener((port) => {
                             const menuElm = await waitForElm('div[role="menu"]');
                             const menuItems = menuElm.querySelectorAll('div[role="menuitem"]');
                             menuItems[2].click();
-                            // await sleep(1000);
                         }
                         let btn = btnElms[0].querySelector('div[role="button"]');
                         btn.click();
@@ -36,31 +37,37 @@ chrome.runtime.onConnect.addListener((port) => {
 
                     const commentsElm = ulElms[0].querySelectorAll('span[lang="vi-VN"]');
                     [...commentsElm].map(async (commentElm) => {
-                        const comment = {};
                         const btnReadMoreElms = commentElm.querySelectorAll('div[role="button"]');
                         if (btnReadMoreElms.length > 0) {
                             btnReadMoreElms[0].click();
                             await sleep(1000);
-                            port.postMessage({
-                                status: 'successfully',
-                                posinset: i,
-                                payload: {
-                                    url: commentElm.parentElement.parentElement.querySelector('a').getAttribute('href'),
-                                    value: commentElm.innerText,
-                                },
-                            });
+                            if (commentElm.innerText.match(keywords))
+                                port.postMessage({
+                                    status: 'successfully',
+                                    posinset: i,
+                                    payload: {
+                                        url: commentElm.parentElement.parentElement
+                                            .querySelector('a')
+                                            .getAttribute('href'),
+                                        value: commentElm.innerText,
+                                    },
+                                });
                         } else {
-                            port.postMessage({
-                                status: 'successfully',
-                                posinset: i,
-                                payload: {
-                                    url: commentElm.parentElement.parentElement.querySelector('a').getAttribute('href'),
-                                    value: commentElm.innerText,
-                                },
-                            });
+                            if (commentElm.innerText.match(keywords))
+                                port.postMessage({
+                                    status: 'successfully',
+                                    posinset: i,
+                                    payload: {
+                                        url: commentElm.parentElement.parentElement
+                                            .querySelector('a')
+                                            .getAttribute('href'),
+                                        value: commentElm.innerText,
+                                    },
+                                });
                         }
                     });
                 }
+                console.log('posinset: ', i);
             }
         }
     });
@@ -90,6 +97,14 @@ function handleSuspendedFeed() {
     const suspendedFeedElm = document.querySelector('.suspended-feed');
     const progressbarElm = suspendedFeedElm.parentElement.querySelector('div[role="progressbar"]');
     progressbarElm.scrollIntoView();
+}
+
+function handleToRegex(array) {
+    const newArray = [];
+    array.forEach((item) => {
+        newArray.push(`(${item})`);
+    });
+    return `/${newArray.join('|')}/`;
 }
 
 function sleep(ms) {
