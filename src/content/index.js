@@ -3,7 +3,7 @@ chrome.runtime.onConnect.addListener((port) => {
         if (req.action === 'scrapping') {
             const keywords = new RegExp(handleToRegex(req.payload));
 
-            for (let i = 1; i < 5; i++) {
+            for (let i = 1; i < 100; i++) {
                 let posinset = null;
                 if (document.querySelector(`div[aria-posinset="${i}"]`)) {
                     posinset = await waitForElm(`div[aria-posinset="${i}"]`);

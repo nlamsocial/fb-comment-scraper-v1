@@ -1,7 +1,8 @@
 import React from 'react';
 import { removeKeyword, useStoreContext } from '../store';
+import { POST } from '../apis';
 
-const DATA_FILE = '..\\src\\assets\\data.json';
+console.log('listkeyword');
 
 const ListKeyword = () => {
     const [state, dispatch] = useStoreContext();
@@ -9,15 +10,19 @@ const ListKeyword = () => {
         dispatch(removeKeyword(index));
     };
 
-    console.log(readFileSync(DATA_FILE));
-
     const handleSearch = () => {
         chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
             const port = chrome.tabs.connect(tabs[0].id, { name: 'popup-content' });
             port.postMessage({ action: 'scrapping', payload: state.keywords });
 
             port.onMessage.addListener((res) => {
-                console.log(res.payload);
+                const data = {
+                    username: res.payload.userName,
+                    userurl: 'https://www.facebook.com/' + res.payload.userUrl,
+                    content: res.payload.content,
+                };
+
+                POST(data);
 
                 const listCommentElm = document.querySelector('#listComment');
                 const commentUl = document.createElement('ul');
